@@ -60,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
       date: DateTime.now(),
     ),]; */
   double totalExpense = 0.0;
+  double weeklyExpense = 0.0;
   List<Transaction> get _recentTransaction {
     return _allTransactions.where((tx) {
       return tx.date.isAfter(DateTime.now().subtract(Duration(days: 7)));
@@ -108,22 +109,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
     List<Map<String, dynamic>> queryTXs =
         await Database_Helper.instance.queryAllTx();
-    print('All Transactions $queryTXs');
     _allTransactions.clear();
     List<Transaction> allItems = [];
+    final weekDay = DateTime.now().subtract(Duration(days: 7));
     double totalExp = 0.0;
+    double weeklyExp = 0.0;
+    var dateValue;
+
+    print('All Transactions $queryTXs');
+
     queryTXs.forEach((element) {
+      dateValue = DateTime.fromMillisecondsSinceEpoch(int.parse(element['date']));
       totalExp += element['amount'];
+      if (dateValue.isAfter(weekDay)) {
+        weeklyExp += element['amount'];
+      }
       allItems.add(Transaction(
         id: element['id'],
         title: element['title'],
         amount: element['amount'],
-        date: DateTime.fromMillisecondsSinceEpoch(int.parse(element['date'])),
+        date: dateValue,
       ));
     });
     setState(() {
       _allTransactions.addAll(allItems);
       totalExpense = totalExp;
+      weeklyExpense = weeklyExp;
     });
     
     //return jsonDecode(prefs.getString('allTransactions'));
@@ -150,14 +161,15 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Center(child: Text('Total Expenses: $totalExpense',)),
+            Center(child: Text('Total Expenses: $totalExpense',),),
+            Center(child: Text('Weekly Expenses: $weeklyExpense', style: TextStyle(fontSize: 18,),),),
             Container(
               width: double.infinity,
               height: (mediaQueryCtx.size.height -
                       appBar.preferredSize.height -
                       mediaQueryCtx.padding.top) *
                   0.3,
-              padding: EdgeInsets.all(5),
+              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               child: Chart(_recentTransaction),
             ),
             //NewTransaction(_addNewTransaction),
