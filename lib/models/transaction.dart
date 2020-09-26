@@ -9,7 +9,7 @@ String txToJson(List<Transaction> data) =>
 
 
 class Transaction {
-  final String id;
+  final int id;
   final String title;
   final double amount;
   final DateTime date;
@@ -32,7 +32,7 @@ class Transaction {
         "id": id,
         "title": title,
         "amount": amount,
-        "date": date
+        "date": date.millisecondsSinceEpoch.toString()
       };
 }
 

@@ -5,11 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:hue_xpense/widgets/chart.dart';
 import 'package:hue_xpense/widgets/new_transaction.dart';
 import 'package:hue_xpense/widgets/transaction_list.dart';
-import './models/transaction.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import './models/transaction.dart';
+import './providers/db_helper.dart';
+
 void main() {
-  //SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(MyApp());
 }
 
@@ -56,36 +59,35 @@ class _MyHomePageState extends State<MyHomePage> {
       amount: 500,
       date: DateTime.now(),
     ),]; */
-
+  double totalExpense = 0.0;
   List<Transaction> get _recentTransaction {
     return _allTransactions.where((tx) {
       return tx.date.isAfter(DateTime.now().subtract(Duration(days: 7)));
     }).toList();
   }
 
-  void _addNewTransaction(String title, double amount, DateTime txDate) {
+  void _addNewTransaction(String title, double amount, DateTime txDate) async {
     final newTx = Transaction(
       title: title,
       amount: amount,
-      id: DateTime.now().toString(),
+      id: DateTime.now().millisecondsSinceEpoch,
       date: txDate,
     );
-
     setState(() {
-      _allTransactions.add(newTx);
-      _saveTransactions();
+      //_allTransactions.add(newTx);
+      _addTransaction(newTx);
     });
   }
 
-  void _deleteTransaction(txId) {
+  void _deleteTransaction(txId) async {
+    var i = await Database_Helper.instance.deleteTX(txId);
+    print('Deleted object $i');
     setState(() {
       _allTransactions.removeWhere((element) => element.id == txId);
-      _saveTransactions();
     });
   }
 
   void _startAddNewTransaction(BuildContext ctx) {
-    //print(_readTransactions());
     showModalBottomSheet(
         context: ctx,
         builder: (bCtx) {
@@ -93,18 +95,43 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  _saveTransactions() async {
+  _addTransaction(newTx) async {
     final prefs = await SharedPreferences.getInstance();
+    int i = await Database_Helper.instance.insertTx(newTx.toJson());
+    print('The new transaction id: $i');
+    _readTransactions();
     prefs.setString('allTransactions', jsonEncode(_allTransactions));
   }
 
   _readTransactions() async {
-    final prefs = await SharedPreferences.getInstance();
-    return jsonDecode(prefs.getString('allTransactions'));
+    //final prefs = await SharedPreferences.getInstance();
+
+    List<Map<String, dynamic>> queryTXs =
+        await Database_Helper.instance.queryAllTx();
+    print('All Transactions $queryTXs');
+    _allTransactions.clear();
+    List<Transaction> allItems = [];
+    double totalExp = 0.0;
+    queryTXs.forEach((element) {
+      totalExp += element['amount'];
+      allItems.add(Transaction(
+        id: element['id'],
+        title: element['title'],
+        amount: element['amount'],
+        date: DateTime.fromMillisecondsSinceEpoch(int.parse(element['date'])),
+      ));
+    });
+    setState(() {
+      _allTransactions.addAll(allItems);
+      totalExpense = totalExp;
+    });
+    
+    //return jsonDecode(prefs.getString('allTransactions'));
   }
 
   @override
   Widget build(BuildContext context) {
+    _readTransactions();
     final appBar = AppBar(
       title: Text('HuEXpense'),
       actions: <Widget>[
@@ -123,17 +150,22 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            Center(child: Text('Total Expenses: $totalExpense',)),
             Container(
               width: double.infinity,
               height: (mediaQueryCtx.size.height -
-                      appBar.preferredSize.height - mediaQueryCtx.padding.top) *
+                      appBar.preferredSize.height -
+                      mediaQueryCtx.padding.top) *
                   0.3,
               padding: EdgeInsets.all(5),
               child: Chart(_recentTransaction),
             ),
             //NewTransaction(_addNewTransaction),
             Container(
-              height: (mediaQueryCtx.size.height - appBar.preferredSize.height - mediaQueryCtx.padding.top) * 0.6,
+              height: (mediaQueryCtx.size.height -
+                      appBar.preferredSize.height -
+                      mediaQueryCtx.padding.top) *
+                  0.6,
               child: TransactionList(_allTransactions, _deleteTransaction),
             ),
           ],

@@ -11,19 +11,19 @@ class UserTransactions extends StatefulWidget {
 class _UserTransactionsState extends State<UserTransactions> {
   final List<Transaction> _allTransactions = [
     Transaction(
-      id: 't1',
+      id: 1,
       title: "Gift Amount",
       amount: 200,
       date: DateTime.now(),
     ),
     Transaction(
-      id: 't2',
+      id: 2,
       title: "Online Spent",
       amount: 2000,
       date: DateTime.now(),
     ),
     Transaction(
-      id: 't3',
+      id: 3,
       title: "Fuel Charges",
       amount: 500,
       date: DateTime.now(),
@@ -34,7 +34,7 @@ class _UserTransactionsState extends State<UserTransactions> {
     final newTx = Transaction(
       title: title,
       amount: amount,
-      id: DateTime.now().toString(),
+      id: DateTime.now().millisecondsSinceEpoch,
       date: DateTime.now(),
     );
 
