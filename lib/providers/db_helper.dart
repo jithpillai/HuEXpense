@@ -10,8 +10,11 @@ class Database_Helper {
   static final _dbVersion = 1;
   static final _txTableName = 'allTransactions';
   static final _notesTableName = 'allNotes';
+  static final _listTypeTable = 'listTypes';
   static final _columnId = 'id';
   static final _title = 'title';
+  static final _name = 'name';
+  static final _desc = 'desc';
   static final _content = 'content';
   static final _amount = 'amount';
   static final _date = 'date';
@@ -60,6 +63,16 @@ class Database_Helper {
           $_columnId INTEGER PRIMARY KEY,
           $_title TEXT NOT NULL,
           $_content TEXT NOT NULL
+        ) 
+      '''
+    );
+
+    await db.execute(
+      '''
+        CREATE TABLE IF NOT EXISTS $_listTypeTable(
+          $_columnId TEXT PRIMARY KEY,
+          $_name TEXT NOT NULL,
+          $_desc TEXT NOT NULL
         ) 
       '''
     );
@@ -120,5 +133,35 @@ class Database_Helper {
   Future<int> deleteNotes(int id) async {
     Database db = await instance.database;
     return await db.delete(_notesTableName, where: '$_columnId = ?', whereArgs: [id]);
+  }
+
+  /* 
+    {
+      id: "movieList",
+      name: "Movie List",
+      desc: "List of fav movies"
+    }
+   */
+
+  Future insertListTypes (Map<String, dynamic> row) async {
+    print(row);
+    Database db = await instance.database;
+    return await db.insert(_listTypeTable, row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllListTypes () async {
+    Database db = await instance.database;
+    return await db.query(_listTypeTable);
+  }
+
+  Future<int> updateListTypes(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    int id = row[_columnId];
+    return await db.update(_listTypeTable, row, where: '$_columnId = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteListTypes(String id) async {
+    Database db = await instance.database;
+    return await db.delete(_listTypeTable, where: '$_columnId = ?', whereArgs: [id]);
   }
 }
