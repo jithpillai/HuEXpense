@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hue_xpense/models/transaction.dart';
-import 'package:hue_xpense/widgets/new_transaction.dart';
-import 'package:hue_xpense/widgets/transaction_list.dart';
+import 'package:hueganizer/models/transaction.dart';
+import 'package:hueganizer/widgets/huexpense/new_transaction.dart';
+import 'package:hueganizer/widgets/huexpense/transaction_list.dart';
 
 class UserTransactions extends StatefulWidget {
   @override

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hue_xpense/models/transaction.dart';
-import 'package:hue_xpense/widgets/chart_bar.dart';
+import 'package:hueganizer/models/transaction.dart';
+import 'package:hueganizer/widgets/huexpense/chart_bar.dart';
 import 'package:intl/intl.dart';
 
 class Chart extends StatelessWidget {
