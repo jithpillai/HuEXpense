@@ -1,4 +1,4 @@
-# hue_xpense
+# Hueganizer
 
 A new Flutter project.
 

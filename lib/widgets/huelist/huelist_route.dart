@@ -76,14 +76,12 @@ class _HueListRouteState extends State<HueListRoute> {
         isScrollControlled: true,
         context: ctx,
         builder: (bCtx) {
-          return AddListType(_addListType);
+          return AddListType(_addListType, true);
         });
   }
 
   _insertDefaultListTypes() {
-    print('Helllllooooo');
     for (var item in _listTypes) {
-      print('Inside....');
       Database_Helper.instance.insertListTypes(ListType(id: item.id, name: item.name, desc: item.desc).toJson());
     }
     Future.delayed(Duration(seconds: 2), () {
@@ -122,7 +120,7 @@ class _HueListRouteState extends State<HueListRoute> {
     return new Scaffold(
       appBar: appBar,
       drawer: AppDrawer(),
-      body: ListGridView(_allListTypes, _deleteListType),
+      body: ListGridView(_allListTypes, _deleteListType, _readAllListTypes),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: RaisedButton(
         color: Theme.of(context).primaryColorDark,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hueganizer/models/notes.dart';
-import 'package:hueganizer/models/notes.dart';
 import 'package:hueganizer/widgets/huenotes/view_notes.dart';
 
 class NotesList extends StatelessWidget {

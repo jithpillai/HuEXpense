@@ -20,7 +20,7 @@ class ViewNotes extends StatelessWidget {
     final newtitle = _titleController.text;
     final newcontent = _contentController.text;
 
-    if (title.isEmpty || content.isEmpty) {
+    if (newtitle.isEmpty || newcontent.isEmpty) {
       return;
     }
     onSavePressed(

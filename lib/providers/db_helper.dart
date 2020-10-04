@@ -11,10 +11,13 @@ class Database_Helper {
   static final _txTableName = 'allTransactions';
   static final _notesTableName = 'allNotes';
   static final _listTypeTable = 'listTypes';
+  static final _listItems = 'listItems';
   static final _columnId = 'id';
+  static final _parentId = 'parentId';
   static final _title = 'title';
   static final _name = 'name';
   static final _desc = 'desc';
+  static final _status = 'status';
   static final _content = 'content';
   static final _amount = 'amount';
   static final _date = 'date';
@@ -72,7 +75,19 @@ class Database_Helper {
         CREATE TABLE IF NOT EXISTS $_listTypeTable(
           $_columnId TEXT PRIMARY KEY,
           $_name TEXT NOT NULL,
-          $_desc TEXT NOT NULL
+          $_desc TEXT
+        ) 
+      '''
+    );
+
+    await db.execute(
+      '''
+        CREATE TABLE IF NOT EXISTS $_listItems(
+          $_columnId TEXT PRIMARY KEY,
+          $_parentId TEXT,
+          $_name TEXT NOT NULL,
+          $_desc TEXT,
+          $_status TEXT
         ) 
       '''
     );
@@ -156,12 +171,43 @@ class Database_Helper {
 
   Future<int> updateListTypes(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    int id = row[_columnId];
+    String id = row[_columnId];
     return await db.update(_listTypeTable, row, where: '$_columnId = ?', whereArgs: [id]);
   }
 
   Future<int> deleteListTypes(String id) async {
     Database db = await instance.database;
+    db.delete(_listItems, where: '$_parentId = ?', whereArgs: [id]);
     return await db.delete(_listTypeTable, where: '$_columnId = ?', whereArgs: [id]);
+  }
+  /* 
+    {
+      id: '13434'
+      parentId: "movieList",
+      name: "Petrol",
+      desc: "For vehicle"
+    }
+   */
+
+  Future insertListItems (Map<String, dynamic> row) async {
+    print(row);
+    Database db = await instance.database;
+    return await db.insert(_listItems, row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryListItems (String parentId) async {
+    Database db = await instance.database;
+    return await db.query(_listItems, where: '$_parentId = ?', whereArgs: [parentId]);
+  }
+
+  Future<int> updateListItems(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    String id = row[_columnId];
+    return await db.update(_listItems, row, where: '$_columnId = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteListItems(String id) async {
+    Database db = await instance.database;
+    return await db.delete(_listItems, where: '$_columnId = ?', whereArgs: [id]);
   }
 }

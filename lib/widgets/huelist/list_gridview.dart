@@ -7,8 +7,9 @@ import 'package:hueganizer/widgets/huelist/list_type_item.dart';
 class ListGridView extends StatefulWidget {
   final List<ListType> _allTypes;
   final Function onDeletePressed;
+  final Function refreshMainGrid;
 
-  ListGridView(this._allTypes, this.onDeletePressed);
+  ListGridView(this._allTypes, this.onDeletePressed, this.refreshMainGrid);
 
   @override
   _ListGridViewState createState() => _ListGridViewState();
@@ -41,6 +42,7 @@ class _ListGridViewState extends State<ListGridView> {
                 desc: item.desc,
                 color: getRandomColor(),
                 onDeletePressed: widget.onDeletePressed,
+                refreshMainGrid: widget.refreshMainGrid,
               ))
           .toList(),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(

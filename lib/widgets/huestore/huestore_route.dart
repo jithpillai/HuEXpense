@@ -16,6 +16,14 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
           title: Text("Hue-Store"),
         ),
         drawer: AppDrawer(),
-        body: Center(child: Text("Store")));
+        body: Center(
+          child: Container(
+              height: 250,
+              child: Image.asset(
+                'assets/images/comingSoon.jpg',
+                fit: BoxFit.cover,
+              ),
+            ),
+        ));
   }
 }

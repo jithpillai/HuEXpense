@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class AddListType extends StatefulWidget {
   final Function onSavePressed;
+  final bool minimizeLength;
 
-  AddListType(this.onSavePressed);
+  AddListType(this.onSavePressed, this.minimizeLength);
 
   @override
   _AddListTypeState createState() => _AddListTypeState();
@@ -42,7 +43,7 @@ class _AddListTypeState extends State<AddListType> {
             children: <Widget>[
               TextField(
                 controller: _nameController,
-                maxLength: 12,
+                maxLength: widget.minimizeLength ? 14 : 30,
                 maxLengthEnforced: true,
                 decoration: InputDecoration(
                   labelText: 'Name',
@@ -50,7 +51,7 @@ class _AddListTypeState extends State<AddListType> {
               ),
               TextField(
                 controller: _descController,
-                maxLength: 28,
+                maxLength: widget.minimizeLength ? 28 : 36,
                 maxLengthEnforced: true,
                 decoration: InputDecoration(
                   labelText: 'Description',
