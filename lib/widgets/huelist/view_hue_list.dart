@@ -4,6 +4,7 @@ import 'package:hueganizer/models/listType.dart';
 import 'package:hueganizer/providers/db_helper.dart';
 import 'package:hueganizer/widgets/huelist/add_list_type.dart';
 import 'package:hueganizer/widgets/huelist/huelist_item.dart';
+import 'package:share/share.dart';
 
 class ViewHueList extends StatefulWidget {
   final String listId;
@@ -111,7 +112,6 @@ class _ViewHueListState extends State<ViewHueList> {
   }
 
   Future<bool> _onWillPop() async {
-
     if (!widget.pageDirty) {
       return true;
     }
@@ -139,18 +139,14 @@ class _ViewHueListState extends State<ViewHueList> {
         false;
   }
 
-  _showSuccessMessage(ctx) {
-    final snackBar = SnackBar(
-      content: Text(
-        'List updated successfully.',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-        ),
-      ),
-      backgroundColor: Colors.green,
-    );
-    Scaffold.of(ctx).showSnackBar(snackBar);
+  String _getListToString() {
+    String fullMessage = widget.name+' \n';
+
+    for (var item in _allListItems) {
+      fullMessage+= item.name+': '+item.desc+' \n';
+    }
+    print(fullMessage);
+    return fullMessage;
   }
 
   _updateListItem(item) async {
@@ -176,6 +172,18 @@ class _ViewHueListState extends State<ViewHueList> {
         },
       ),
       actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.share),
+          color: Colors.white,
+          onPressed: () {
+            final RenderBox box = context.findRenderObject();
+            Share.share(
+              _getListToString(),
+              subject:  widget.name,
+              sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+            );
+          },
+        ),
         IconButton(
           icon: Icon(Icons.save),
           color: Colors.white,
@@ -220,7 +228,7 @@ class _ViewHueListState extends State<ViewHueList> {
       floatingActionButton: RaisedButton(
         color: Theme.of(context).accentColor,
         child: Container(
-          width: 90,
+          width: 95,
           child: Row(
             children: [
               Icon(

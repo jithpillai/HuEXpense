@@ -158,7 +158,7 @@ class _HueListRouteState extends State<HueListRoute> {
                 color: Colors.white,
               ),
               SizedBox(
-                width: 10,
+                width: 5,
               ),
               Text(
                 "Add List",

@@ -321,7 +321,7 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
                           height: 10,
                         ),
                         Container(
-                          height: 120,
+                          height: 100,
                           child: Image.asset(
                             'assets/images/waiting.png',
                             fit: BoxFit.cover,
