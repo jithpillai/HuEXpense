@@ -8,4 +8,5 @@ class HueConstants {
   static const String hueXpense = HueXpenseRoute.routeName;
   static const String hueList = HueListRoute.routeName;
   static const String hueStore = HueStoreRoute.routeName;
+  static const String hueStoreListMsg = 'Added by Hue-Store';
 }

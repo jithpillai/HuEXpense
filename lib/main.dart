@@ -14,6 +14,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  String landingPage = '/store';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
         accentColor: Colors.deepOrange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/expense', 
+      initialRoute: landingPage, 
       routes: { 
         '/': (context) => HueXpenseRoute(), 
         HueConstants.hueXpense: (context) => HueXpenseRoute(), 

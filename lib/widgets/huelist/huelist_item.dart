@@ -95,7 +95,7 @@ class _HueListItemState extends State<HueListItem> {
                         _updateListItem(item);
                       });
                       var itemname = item.name;
-                      String messaege = item.status != 'Done' ? 'Completed' : 'To Do';
+                      String messaege = item.status == 'Done' ? 'Completed' : 'To Do';
                       
                       Scaffold.of(context).showSnackBar(
                           SnackBar(content: Text("$itemname marked $messaege")));

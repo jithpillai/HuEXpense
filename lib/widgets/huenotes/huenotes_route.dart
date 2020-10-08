@@ -80,7 +80,6 @@ class _HueNotesRouteState extends State<HueNotesRoute> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQueryCtx = MediaQuery.of(context);
     final appBar = AppBar(
       title: Text('Hue-Notes'),
       actions: <Widget>[

@@ -12,7 +12,7 @@ class HueListRoute extends StatefulWidget {
 }
 
 class _HueListRouteState extends State<HueListRoute> {
-  final _listTypes = [
+  final List<ListType> _listTypes = [
     ListType(
         id: 'shoppingList', name: 'Shopping List', desc: "Basic shopping list"),
     ListType(id: 'personal', name: 'Personal', desc: "Add anything personal"),
@@ -28,12 +28,14 @@ class _HueListRouteState extends State<HueListRoute> {
         desc: "All your favorite movies to watch"),
   ];
   final List<ListType> _allListTypes = [];
+  var myCtx;
 
   _readAllListTypes() async {
-    List<Map<String, dynamic>> queryListTypes = await Database_Helper.instance.queryAllListTypes();
+    List<Map<String, dynamic>> queryListTypes =
+        await Database_Helper.instance.queryAllListTypes();
     print(queryListTypes);
     print(queryListTypes.length);
-    if(queryListTypes.length == 0) {
+    if (queryListTypes.length == 0) {
       _insertDefaultListTypes();
       return;
     }
@@ -44,7 +46,6 @@ class _HueListRouteState extends State<HueListRoute> {
     print('All List Types $queryListTypes');
 
     queryListTypes.forEach((element) {
-      
       allItems.add(ListType(
         id: element['id'],
         name: element['name'],
@@ -58,10 +59,9 @@ class _HueListRouteState extends State<HueListRoute> {
 
   _addListType(String newName, String newDesc) {
     var type = ListType(
-      name: newName,
-      desc: newDesc,
-      id: DateTime.now().millisecondsSinceEpoch.toString()
-    );
+        name: newName,
+        desc: newDesc,
+        id: DateTime.now().millisecondsSinceEpoch.toString());
     _insertListType(type);
   }
 
@@ -82,7 +82,8 @@ class _HueListRouteState extends State<HueListRoute> {
 
   _insertDefaultListTypes() {
     for (var item in _listTypes) {
-      Database_Helper.instance.insertListTypes(ListType(id: item.id, name: item.name, desc: item.desc).toJson());
+      Database_Helper.instance.insertListTypes(
+          ListType(id: item.id, name: item.name, desc: item.desc).toJson());
     }
     Future.delayed(Duration(seconds: 2), () {
       _readAllListTypes();
@@ -90,6 +91,29 @@ class _HueListRouteState extends State<HueListRoute> {
   }
 
   void _deleteListType(listId) async {
+    showDialog(
+      context: myCtx,
+      builder: (ctx) => new AlertDialog(
+        title: new Text('Are you sure?'),
+        content: new Text('All the items added to this list will also be deleted.'),
+        actions: <Widget>[
+          new FlatButton(
+            onPressed: () => Navigator.of(ctx).pop(false), //false will stop the pop
+            child: new Text('No'),
+          ),
+          new FlatButton(
+            onPressed: () {
+              _doDeleteList(listId);
+              Navigator.of(ctx).pop(false);
+            },
+            child: new Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _doDeleteList(listId) async {
     var i = await Database_Helper.instance.deleteListTypes(listId);
     print('Deleted $i');
     setState(() {
@@ -105,6 +129,7 @@ class _HueListRouteState extends State<HueListRoute> {
 
   @override
   Widget build(BuildContext context) {
+    myCtx = context;
     final appBar = AppBar(
       title: Text('Hue-List'),
       actions: <Widget>[

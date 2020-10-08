@@ -8,6 +8,7 @@ class ListTypeItem extends StatelessWidget {
   final Color color;
   final Function onDeletePressed;
   final Function refreshMainGrid;
+  final List<String> _nonDeletables = ['shoppingList', 'bucketList', 'ideas'];
 
   ListTypeItem(
       {this.id, this.name, this.desc, this.color, this.onDeletePressed, this.refreshMainGrid});
@@ -59,7 +60,7 @@ class ListTypeItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                IconButton(
+                _nonDeletables.contains(id) ? SizedBox() : IconButton(
                   icon: Icon(Icons.delete_outline),
                   onPressed: () {
                     onDeletePressed(id);

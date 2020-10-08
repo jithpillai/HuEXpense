@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:hueganizer/constants/constants.dart';
+import 'package:hueganizer/models/store_item.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -12,6 +14,8 @@ class Database_Helper {
   static final _notesTableName = 'allNotes';
   static final _listTypeTable = 'listTypes';
   static final _listItems = 'listItems';
+  static final _storeTable = '_StoreTable';
+  static final _storeItemsTable = '_storeItemsTable';
   static final _columnId = 'id';
   static final _parentId = 'parentId';
   static final _title = 'title';
@@ -21,6 +25,8 @@ class Database_Helper {
   static final _content = 'content';
   static final _amount = 'amount';
   static final _date = 'date';
+  static final _count = 'count';
+  static final _addedToList = 'addedToList';
 
   Database_Helper._privateConstructor();
 
@@ -88,6 +94,28 @@ class Database_Helper {
           $_name TEXT NOT NULL,
           $_desc TEXT,
           $_status TEXT
+        ) 
+      '''
+    );
+
+    await db.execute(
+      '''
+        CREATE TABLE IF NOT EXISTS $_storeTable(
+          $_columnId TEXT PRIMARY KEY,
+          $_name TEXT NOT NULL,
+          $_desc TEXT
+        ) 
+      '''
+    );
+
+    await db.execute(
+      '''
+        CREATE TABLE IF NOT EXISTS $_storeItemsTable(
+          $_columnId TEXT PRIMARY KEY,
+          $_parentId TEXT,
+          $_name TEXT NOT NULL,
+          $_count INTEGER,
+          $_addedToList TEXT
         ) 
       '''
     );
@@ -209,5 +237,56 @@ class Database_Helper {
   Future<int> deleteListItems(String id) async {
     Database db = await instance.database;
     return await db.delete(_listItems, where: '$_columnId = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteHueStoreListItems(StoreItem item) async {
+    Database db = await instance.database;
+    return await db.delete(_listItems, where: '$_name = ?', whereArgs: [item.name]);
+  }
+
+
+  Future insertStore (Map<String, dynamic> row) async {
+    print(row);
+    Database db = await instance.database;
+    return await db.insert(_storeTable, row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllStores () async {
+    Database db = await instance.database;
+    return await db.query(_storeTable);
+  }
+
+  Future<int> updateStore(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    String id = row[_columnId];
+    return await db.update(_storeTable, row, where: '$_columnId = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteStore(String id) async {
+    Database db = await instance.database;
+    db.delete(_storeItemsTable, where: '$_parentId = ?', whereArgs: [id]);
+    return await db.delete(_storeTable, where: '$_columnId = ?', whereArgs: [id]);
+  }
+
+  Future insertStoreItems (Map<String, dynamic> row) async {
+    print(row);
+    Database db = await instance.database;
+    return await db.insert(_storeItemsTable, row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryStoreItems (String parentId) async {
+    Database db = await instance.database;
+    return await db.query(_storeItemsTable, where: '$_parentId = ?', whereArgs: [parentId]);
+  }
+
+  Future<int> updateStoreItems(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    String id = row[_columnId];
+    return await db.update(_storeItemsTable, row, where: '$_columnId = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteStoreItems(String id) async {
+    Database db = await instance.database;
+    return await db.delete(_storeItemsTable, where: '$_columnId = ?', whereArgs: [id]);
   }
 }
