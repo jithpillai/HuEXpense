@@ -1,16 +1,17 @@
 # Hueganizer
 
-A new Flutter project.
+The app has 4 different sub apps
 
-## Getting Started
+Hue-Store: Manage all your inventory or stocks in one place, auto add items to shopping list when the item quantity is low
 
-This project is a starting point for a Flutter application.
+Hue-List: Create, edit and share any kind of list, with in built lists like Shopping List, Ideas and Bucket List
 
-A few resources to get you started if this is your first Flutter project:
+Hue-Notes: Note and share anything in your mind
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Hue-Expense: Track all your weekly expense
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+We will be updating the features of the app regularly.
+
+For any suggestion or issues please send email to developer huedroidin@gmail.com or comments.
+
+
