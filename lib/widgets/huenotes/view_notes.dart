@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share/share.dart';
 
 class ViewNotes extends StatelessWidget {
   final int noteId;
@@ -44,6 +45,24 @@ class ViewNotes extends StatelessWidget {
             hintText: "Title",
           ),
         ),
+        actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.share),
+          color: Colors.white,
+          onPressed: () {
+            String newtitle = _titleController.text;
+            String newcontent = _contentController.text;
+            String shareContent = '*'+newtitle+'* \n'; //* added for Whatsapp bold text
+
+            shareContent += newcontent; 
+            final RenderBox box = context.findRenderObject();
+            Share.share(
+              shareContent,
+              subject:  'Notes: '+newcontent,
+              sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+            );
+          },
+        ),],
       ),
       body: new Container(
         width: double.infinity,

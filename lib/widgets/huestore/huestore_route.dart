@@ -9,6 +9,7 @@ import 'package:hueganizer/widgets/huestore/add_store_form.dart';
 import 'package:hueganizer/widgets/huestore/store_item_form.dart';
 import 'package:hueganizer/widgets/huestore/store_item_list.dart';
 import 'package:hueganizer/widgets/huestore/store_slider.dart';
+import 'package:share/share.dart';
 
 class HueStoreRoute extends StatefulWidget {
   static const String routeName = '/store';
@@ -29,7 +30,7 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
   List<StoreItem> _allStoreItems = [];
   String selectedStoreId = 'firstStore';
   String selectedStoreName = '';
-  
+
   void _doDeleteStore(storeId) async {
     var i = await Database_Helper.instance.deleteStore(storeId);
     print('Deleted $i');
@@ -107,7 +108,7 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
       Database_Helper.instance.insertStore(
           StoreModel(id: item.id, name: item.name, desc: item.desc).toJson());
     }
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       _readAllStores();
     });
   }
@@ -201,9 +202,9 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
   _updateStoreItem(StoreItem item) async {
     String addedToList = item.addedToList;
     if (item.count > 0 && addedToList == 'true') {
-        _removeFromShoppingList(item);
-        addedToList = 'false';
-    } 
+      _removeFromShoppingList(item);
+      addedToList = 'false';
+    }
     if (item.count == 0) {
       _addShoppingListItem(item);
       addedToList = 'true';
@@ -230,7 +231,7 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
     int i = await Database_Helper.instance.insertListItems(newItem.toJson());
     print('The new item id: $i');
     Scaffold.of(myCtx).showSnackBar(
-                          SnackBar(content: Text("$itemname added to your shopping list")));
+        SnackBar(content: Text("$itemname added to your shopping list")));
   }
 
   void _removeFromShoppingList(StoreItem item) async {
@@ -238,7 +239,7 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
     int i = await Database_Helper.instance.deleteHueStoreListItems(item);
     print('The deleted item id: $i');
     Scaffold.of(myCtx).showSnackBar(
-                          SnackBar(content: Text("$itemname removed from shopping list")));
+        SnackBar(content: Text("$itemname removed from shopping list")));
   }
 
   _refreshStoreItems(StoreModel item) {
@@ -247,6 +248,16 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
       selectedStoreName = item.name;
     });
     _readAllItems(item.id);
+  }
+
+  String _getStoreItemsToString() {
+    String fullMessage = '*'+selectedStoreName + ' stocks* \n'; //* added for Whatsapp bold text
+
+    for (var item in _allStoreItems) {
+      fullMessage += item.name + ': ' + item.count.toString() + ' \n';
+    }
+    print(fullMessage);
+    return fullMessage;
   }
 
   @override
@@ -334,18 +345,39 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
                     (StoreModel store) {
                     _startUpdateStore(myCtx, store);
                   }, _refreshStoreItems),
+            //Store Item Header
             Container(
-              padding: EdgeInsets.only(top: 5, left: 10),
-              child: Text(
-                selectedStoreName,
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+              padding: EdgeInsets.only(top: 5, left: 10, bottom: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectedStoreName,
+                    style: TextStyle(
+                      fontSize: 22,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Container(
+                    child: IconButton(
+                      icon: Icon(Icons.share),
+                      color: Colors.white,
+                      onPressed: () {
+                        final RenderBox box = context.findRenderObject();
+                        Share.share(
+                          _getStoreItemsToString(),
+                          subject: 'Inventory Stock: ' + selectedStoreName,
+                          sharePositionOrigin:
+                              box.localToGlobal(Offset.zero) & box.size,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
               width: double.infinity,
-              height: 40,
+              height: 50,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -357,7 +389,8 @@ class _HueStoreRouteState extends State<HueStoreRoute> {
                 ),
               ),
             ),
-            StoreItemList(selectedStoreId, selectedStoreName, _allStoreItems, _startUpdateStoreItem, _readAllItems)
+            StoreItemList(selectedStoreId, selectedStoreName, _allStoreItems,
+                _startUpdateStoreItem, _readAllItems)
           ],
         ));
   }

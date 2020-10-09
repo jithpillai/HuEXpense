@@ -32,9 +32,6 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
   Drawer build(BuildContext context) {
     return Drawer(
-      // Add a ListView to the drawer. This ensures the user can scroll
-      // through the options in the drawer if there isn't enough vertical
-      // space to fit everything.
       child: ListView(
         // Important: Remove any padding from the ListView.
         padding: EdgeInsets.zero,
@@ -52,11 +49,21 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             child: Stack(
               children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(left: 16, top: 5),
+                  child: Text(
+                    HueConstants.appDesc,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                ),
                 Positioned(
                   bottom: 12.0,
                   left: 16.0,
                   child: Text(
-                    "Hueganizer",
+                    HueConstants.appTitle,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 25.0,
@@ -68,19 +75,19 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
           _createDrawerItem(
-            Icons.account_balance_wallet,
-            'Hue-Xpense',
+            Icons.dashboard,
+            'Dashboard',
             () {
               return Navigator.pushReplacementNamed(
-                  context, HueConstants.hueXpense);
+                  context, HueConstants.hueDashboard);
             },
           ),
           _createDrawerItem(
-            Icons.note,
-            'Hue-Notes',
+            Icons.store,
+            'Hue-Store',
             () {
               return Navigator.pushReplacementNamed(
-                  context, HueConstants.hueNotes);
+                  context, HueConstants.hueStore);
             },
           ),
           _createDrawerItem(
@@ -92,11 +99,19 @@ class _AppDrawerState extends State<AppDrawer> {
             },
           ),
           _createDrawerItem(
-            Icons.store,
-            'Hue-Store',
+            Icons.note,
+            'Hue-Notes',
             () {
               return Navigator.pushReplacementNamed(
-                  context, HueConstants.hueStore);
+                  context, HueConstants.hueNotes);
+            },
+          ),
+          _createDrawerItem(
+            Icons.account_balance_wallet,
+            'Hue-Xpense',
+            () {
+              return Navigator.pushReplacementNamed(
+                  context, HueConstants.hueXpense);
             },
           ),
         ],

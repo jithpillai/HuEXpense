@@ -140,7 +140,7 @@ class _ViewHueListState extends State<ViewHueList> {
   }
 
   String _getListToString() {
-    String fullMessage = widget.name+' \n';
+    String fullMessage = '*'+widget.name+' items* \n'; //* added for Whatsapp bold text
 
     for (var item in _allListItems) {
       fullMessage+= item.name+': '+item.desc+' \n';

@@ -36,7 +36,7 @@ class _StoreSliderState extends State<StoreSlider> {
   Widget build(BuildContext context) {
     List<StoreModel> allStores = widget._allStores;
     return Container(
-      height: 180,
+      height: 170,
       //height: MediaQuery.of(context).size.height * 0.6,
       child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -52,7 +52,7 @@ class _StoreSliderState extends State<StoreSlider> {
                   child: Container(
                     margin: EdgeInsets.all(10),
                     padding: EdgeInsets.all(10),
-                    height: 160,
+                    height: 150,
                     width: 120,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
