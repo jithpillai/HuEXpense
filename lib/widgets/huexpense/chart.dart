@@ -5,24 +5,30 @@ import 'package:intl/intl.dart';
 
 class Chart extends StatelessWidget {
   final List<Transaction> recentTransactions;
+  final bool showExpense;
+  final int weekDifference;
   int chartLength = 7;
 
-  Chart(this.recentTransactions);
+  Chart(this.recentTransactions, this.showExpense, this.weekDifference);
 
   List<Map<String, Object>> get groupedTransactionValues {
     return List.generate(chartLength, (index) {
-      final weekDay = DateTime.now().subtract(Duration(days: index));
+      final weekDay = DateTime.now().subtract(Duration(days: weekDifference + index));
       double totalSum = 0;
-
       for (var i = 0; i < recentTransactions.length; i++) {
         if (recentTransactions[i].date.day == weekDay.day &&
             recentTransactions[i].date.month == weekDay.month &&
             recentTransactions[i].date.year == weekDay.year) {
-          totalSum += recentTransactions[i].amount;
+          if (showExpense && recentTransactions[i].expense != 'false') {
+            totalSum += recentTransactions[i].amount;
+          }
+          if (!showExpense && recentTransactions[i].expense == 'false') {
+            totalSum += recentTransactions[i].amount;
+          }
         }
       }
       return {
-        'day': DateFormat.E().format(weekDay).substring(0, 1),
+        'day': DateFormat.E().format(weekDay).substring(0, 3),
         'amount': totalSum,
       };
     }).reversed.toList();
@@ -30,7 +36,20 @@ class Chart extends StatelessWidget {
 
   double get totalSpending {
     return groupedTransactionValues.fold(0.0, (previousValue, element) {
-      return previousValue + element['amount'];
+      if (element['expense'] != 'false') {
+        return previousValue + element['amount'];
+      } else {
+        return previousValue;
+      }
+    });
+  }
+  double get totalRecieved {
+    return groupedTransactionValues.fold(0.0, (previousValue, element) {
+      if (element['expense'] == 'false') {
+        return previousValue + element['amount'];
+      } else {
+        return previousValue;
+      }
     });
   }
 
@@ -38,7 +57,7 @@ class Chart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 6,
-      margin: EdgeInsets.all(20),
+      margin: EdgeInsets.only(top:5, bottom: 5, left: 20, right: 20),
       child: Container(
         padding: EdgeInsets.all(6),
         child: Row(
@@ -52,7 +71,10 @@ class Chart extends StatelessWidget {
                   data['amount'],
                   totalSpending == 0.0
                       ? 0.0
-                      : (data['amount'] as double) / totalSpending),
+                      : (data['amount'] as double) / totalSpending,
+                  showExpense ? Theme.of(context).accentColor : Colors.green[900],
+              ),
+                  
             );
           }).toList(),
         ),

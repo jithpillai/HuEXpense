@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +20,8 @@ class _NewTransactionState extends State<NewTransaction> {
 
   DateTime pickedDate = DateTime.now();
 
+  String expense = 'true';
+
   void _submitTransaction() {
     if (_amountController.text.isEmpty) {
       return;
@@ -28,7 +32,7 @@ class _NewTransactionState extends State<NewTransaction> {
     if (title.isEmpty || amount <= 0) {
       return;
     }
-    widget.onAddPressed(title, amount, pickedDate);
+    widget.onAddPressed(title, amount, pickedDate, expense);
     Navigator.of(context).pop();
   }
 
@@ -97,6 +101,37 @@ class _NewTransactionState extends State<NewTransaction> {
                     onPressed: () {
                       _presentDatePicker();
                     },
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Expense',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: expense == 'true' ? Colors.red[900] : Colors.black,
+                    ),
+                  ),
+                  SizedBox(width: 10,),
+                  Switch(
+                    value: expense != 'true',
+                    onChanged: (value) {
+                      setState(() {
+                        expense = value ? 'false' : 'true';
+                        print(expense);
+                      });
+                    },
+                    inactiveTrackColor: Colors.redAccent,
+                    inactiveThumbColor: Colors.red[900],
+                    activeTrackColor: Colors.lightGreenAccent,
+                    activeColor: Colors.green,
+                  ),
+                  SizedBox(width: 10,),
+                  Text('Received',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: expense == 'false' ? Colors.green[900] : Colors.black,
+                    ),
                   ),
                 ],
               ),

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import '../../models/transaction.dart';
 import 'package:intl/intl.dart';
@@ -46,11 +48,16 @@ class TransactionList extends StatelessWidget {
                   child: ListTile(
                     leading: CircleAvatar(
                       radius: 30,
+                      backgroundColor: _allTransactions[index].expense == 'false' ? Colors.green[700] : Colors.red[700],
                       child: Padding(
                         padding: EdgeInsets.all(6),
                         child: FittedBox(
                           child: Text(
                             '₹${_allTransactions[index].amount.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),

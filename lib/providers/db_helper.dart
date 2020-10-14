@@ -9,7 +9,7 @@ import 'package:path/path.dart';
 
 class Database_Helper {
   static final _dbName = 'myDatabase.db';
-  static final _dbVersion = 1;
+  static final _dbVersion = 2;
   static final _txTableName = 'allTransactions';
   static final _notesTableName = 'allNotes';
   static final _listTypeTable = 'listTypes';
@@ -19,6 +19,7 @@ class Database_Helper {
   static final _columnId = 'id';
   static final _parentId = 'parentId';
   static final _title = 'title';
+  static final _expense = 'expense';
   static final _name = 'name';
   static final _desc = 'desc';
   static final _status = 'status';
@@ -51,6 +52,7 @@ class Database_Helper {
       path,
       version: _dbVersion,
       onCreate: _createTables,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -61,7 +63,8 @@ class Database_Helper {
           $_columnId INTEGER PRIMARY KEY,
           $_title TEXT NOT NULL,
           $_amount REAL NOT NULL,
-          $_date TEXT NOT NULL
+          $_date TEXT NOT NULL,
+          $_expense TEXT
         ) 
       '''
     );
@@ -119,6 +122,12 @@ class Database_Helper {
         ) 
       '''
     );
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < newVersion) {
+      db.execute("ALTER TABLE $_txTableName ADD COLUMN $_expense TEXT;");
+    }
   }
 
   //All Transaction Opertations
