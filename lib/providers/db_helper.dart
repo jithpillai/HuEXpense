@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:hueganizer/constants/constants.dart';
 import 'package:hueganizer/models/store_item.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';

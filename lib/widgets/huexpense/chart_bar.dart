@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class ChartBar extends StatelessWidget {
@@ -5,8 +7,10 @@ class ChartBar extends StatelessWidget {
   final double spendingAmount;
   final double spendingPctOfTotal;
   final Color barColor;
+  final bool allTrans;
 
-  ChartBar(this.label, this.spendingAmount, this.spendingPctOfTotal, this.barColor);
+  ChartBar(this.label, this.spendingAmount, this.spendingPctOfTotal,
+      this.barColor, this.allTrans);
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (ctx, constraints) {
@@ -17,6 +21,9 @@ class ChartBar extends StatelessWidget {
             child: FittedBox(
               child: Text(
                 '₹${spendingAmount.toStringAsFixed(0)}',
+                  style: TextStyle(
+                    color: allTrans && spendingAmount != 0.0 ? barColor : Colors.black,
+                  ),
               ),
             ),
           ),
@@ -30,7 +37,10 @@ class ChartBar extends StatelessWidget {
               children: <Widget>[
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 1.0),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
+                    ),
                     color: Color.fromRGBO(220, 220, 220, 1),
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -39,7 +49,7 @@ class ChartBar extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: FractionallySizedBox(
-                      heightFactor: spendingPctOfTotal,
+                      heightFactor: spendingPctOfTotal > 1 ? 1 : spendingPctOfTotal,
                       child: Container(
                         decoration: BoxDecoration(
                           color: barColor,

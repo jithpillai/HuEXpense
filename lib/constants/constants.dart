@@ -13,4 +13,7 @@ class HueConstants {
   static const String hueStoreListMsg = 'Added by Hue-Store';
   static const String appTitle = 'Hueganizer';
   static const String appDesc = 'Organize Thoughts, Stocks\nand anything else...';
+  static const String expenses = 'Expenses';
+  static const String allTransactions = 'All Transactions';
+  static const String credits = 'Credits';
 }

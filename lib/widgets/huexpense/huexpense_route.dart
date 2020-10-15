@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:ui';
+import 'package:hueganizer/constants/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:hueganizer/widgets/app_drawer.dart';
@@ -21,6 +23,7 @@ class HueXpenseRoute extends StatefulWidget {
 class _HueXpenseRouteState extends State<HueXpenseRoute>
     with WidgetsBindingObserver {
   final List<Transaction> _allTransactions = [];
+  final List<Transaction> _showList = [];
   double totalExpense = 0.0;
   double weeklyExpense = 0.0;
   double totalReceived = 0.0;
@@ -29,6 +32,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
   int weekDifference = 0;
   String weekShown = 'Week';
   final List<Transaction> _recentTransaction = [];
+  String currentMode = HueConstants.allTransactions;
 
   List<Transaction> getRecentTransaction() {
     final startDay =
@@ -50,9 +54,12 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
     double weeklyExp = 0.0;
     double weeklyCred = 0.0;
     List<Transaction> recentItems = [];
+    List<Transaction> showItems = [];
     var dateValue;
+    bool pushAll = currentMode == HueConstants.allTransactions;
 
     _recentTransaction.clear();
+    _showList.clear();
     recentItems = getRecentTransaction();
     //print('recentItems $recentItems');
     _allTransactions.forEach((element) {
@@ -70,6 +77,26 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
       }
     });
 
+    recentItems.forEach((element) {
+      bool addToShowList = pushAll;
+      if (!addToShowList) {
+        if (currentMode == HueConstants.expenses) {
+          addToShowList = element.expense != 'false';
+        } else {
+          addToShowList = element.expense == 'false';
+        }
+      }
+      if (addToShowList) {
+        showItems.add(Transaction(
+            id: element.id,
+            title: element.title,
+            amount: element.amount,
+            date:  element.date,
+            expense: element.expense,
+        ));
+      }
+    });
+
     setState(() {
       totalExpense = totalExp;
       weeklyExpense = weeklyExp;
@@ -77,6 +104,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
       weeklyReceived = weeklyCred;
       weekShown = '$startDayString - $endDayString';
       _recentTransaction.addAll(recentItems);
+      _showList.addAll(showItems);
     });
   }
 
@@ -117,7 +145,6 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
     int i = await Database_Helper.instance.insertTx(newTx.toJson());
     print('The new transaction id: $i');
     _readTransactions();
-    prefs.setString('allTransactions', jsonEncode(_allTransactions));
   }
 
   _readTransactions() async {
@@ -126,9 +153,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
     List<Map<String, dynamic>> queryTXs =
         await Database_Helper.instance.queryAllTx();
     _allTransactions.clear();
-    _recentTransaction.clear();
     List<Transaction> allItems = [];
-    List<Transaction> recentItems = [];
     final startDay =
         DateTime.now().subtract(Duration(days: weekDifference + 7));
     final endDay = DateTime.now().subtract(Duration(days: weekDifference));
@@ -139,8 +164,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
     double weeklyExp = 0.0;
     double weeklyCred = 0.0;
     var dateValue;
-
-    recentItems = getRecentTransaction();
+    
     queryTXs.forEach((element) {
       dateValue =
           DateTime.fromMillisecondsSinceEpoch(int.parse(element['date']));
@@ -157,11 +181,11 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
       }
 
       allItems.add(Transaction(
-        id: element['id'],
-        title: element['title'],
-        amount: element['amount'],
-        date: dateValue,
-        expense: element['expense'],
+          id: element['id'],
+          title: element['title'],
+          amount: element['amount'],
+          date: dateValue,
+          expense: element['expense'],
       ));
     });
     setState(() {
@@ -175,6 +199,133 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
     _refreshChartData();
 
     //return jsonDecode(prefs.getString('allTransactions'));
+  }
+
+  DropdownButton getModeDropDown() {
+    Color currentColor;
+    IconData currentIcon;
+
+    if (currentMode == HueConstants.expenses) {
+      currentColor = Colors.red[900];
+      currentIcon = Icons.arrow_downward;
+    } else if (currentMode ==HueConstants.credits) {
+      currentColor = Colors.green[900];
+      currentIcon = Icons.arrow_upward_rounded;
+    } else {
+      currentColor = Colors.blue[700];
+      currentIcon = Icons.double_arrow;
+    }
+    return DropdownButton<String>(
+      value: currentMode,
+      icon: Icon(
+        currentIcon,
+        color: currentColor,
+      ),
+      iconSize: 20,
+      elevation: 16,
+      style: TextStyle(
+        color: currentColor,
+        fontSize: 14,
+      ),
+      underline: Container(
+        height: 2,
+        color: currentColor,
+      ),
+      onChanged: (String newValue) {
+        setState(() {
+          currentMode = newValue;
+          showExpense = newValue == HueConstants.expenses;
+        });
+        _refreshChartData();
+      },
+      items: <String>[HueConstants.allTransactions, HueConstants.expenses, HueConstants.credits]
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(
+            value,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget getTotalTxText() {
+    double value;
+    String label;
+    bool negative = false;
+
+    if (currentMode ==HueConstants.credits) {
+      value = totalReceived;
+      label = 'Total:';
+    } else if (currentMode == HueConstants.expenses) {
+      value = totalExpense;
+      label = 'Total:';
+    } else {
+      value = totalReceived - totalExpense;
+      label = 'Balance:';
+    }
+    return Row(
+      children: [
+        FittedBox(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SizedBox(width: 5,),
+        FittedBox(
+          child: Text(
+            value.toString(),
+            style: TextStyle(
+              color: value.isNegative ? Colors.red : Theme.of(context).primaryColor,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getWeeklyTotal() {
+    double value;
+    String label = 'This Week:';
+
+    if (currentMode ==HueConstants.credits) {
+      value = weeklyReceived;
+    } else if (currentMode == HueConstants.expenses) {
+      value = weeklyExpense;
+    } else {
+      value = weeklyReceived - weeklyExpense;
+    }
+    return Row(
+      children: [
+        FittedBox(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SizedBox(width: 5,),
+        FittedBox(
+          child: Text(
+            value.toString(),
+            style: TextStyle(
+              color: value.isNegative ? Colors.red : Theme.of(context).primaryColor,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -218,27 +369,14 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              /* Center(
-              child: Text(
-                'Total Expenses: $totalExpense',
-              ),
-            ),
-            Center(
-              child: Text(
-                'Weekly Expenses: $weeklyExpense',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ), */
               Container(
-                padding: EdgeInsets.only(top: 5, left: 10, bottom: 0),
+                padding: EdgeInsets.only(top: 5, left: 10, bottom: 0, right: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        Switch(
+                        /* Switch(
                           value: showExpense,
                           onChanged: (value) {
                             setState(() {
@@ -249,37 +387,15 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
                           activeColor: Colors.red[900],
                           inactiveTrackColor: Colors.lightGreenAccent,
                           inactiveThumbColor: Colors.green[900],
-                        ),
+                        ), */
+                        getModeDropDown(),
                         SizedBox(
-                          width: 5,
+                          width: 10,
                         ),
-                        Text(
-                          showExpense ? 'Expenses' : 'Credits',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        getWeeklyTotal(),
                       ],
                     ),
-                    Column(
-                      children: [
-                        showExpense
-                            ? Text(
-                                'Total:$totalExpense',
-                              )
-                            : Text(
-                                'Total:$totalReceived',
-                              ),
-                        showExpense
-                            ? Text(
-                                'Week:$weeklyExpense',
-                              )
-                            : Text(
-                                'Week:$weeklyReceived',
-                              ),
-                      ],
-                    ),
+                    getTotalTxText(),
                   ],
                 ),
                 width: double.infinity,
@@ -302,7 +418,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
                         mediaQueryCtx.padding.top) *
                     0.25,
                 padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-                child: Chart(_recentTransaction, showExpense, weekDifference),
+                child: Chart(_recentTransaction, currentMode, weekDifference),
               ),
               Container(
                 child: Row(
@@ -365,7 +481,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
                         appBar.preferredSize.height -
                         mediaQueryCtx.padding.top) *
                     0.55,
-                child: TransactionList(_allTransactions, _deleteTransaction),
+                child: TransactionList(_showList, _deleteTransaction),
               ),
             ],
           ),
