@@ -88,11 +88,11 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
       }
       if (addToShowList) {
         showItems.add(Transaction(
-            id: element.id,
-            title: element.title,
-            amount: element.amount,
-            date:  element.date,
-            expense: element.expense,
+          id: element.id,
+          title: element.title,
+          amount: element.amount,
+          date: element.date,
+          expense: element.expense,
         ));
       }
     });
@@ -132,11 +132,12 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
   }
 
   void _startAddNewTransaction(BuildContext ctx) {
+    DateTime endDay = DateTime.now().subtract(Duration(days: weekDifference));
     showModalBottomSheet(
         isScrollControlled: true,
         context: ctx,
         builder: (bCtx) {
-          return NewTransaction(_addNewTransaction);
+          return NewTransaction(_addNewTransaction, endDay);
         });
   }
 
@@ -164,7 +165,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
     double weeklyExp = 0.0;
     double weeklyCred = 0.0;
     var dateValue;
-    
+
     queryTXs.forEach((element) {
       dateValue =
           DateTime.fromMillisecondsSinceEpoch(int.parse(element['date']));
@@ -181,11 +182,11 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
       }
 
       allItems.add(Transaction(
-          id: element['id'],
-          title: element['title'],
-          amount: element['amount'],
-          date: dateValue,
-          expense: element['expense'],
+        id: element['id'],
+        title: element['title'],
+        amount: element['amount'],
+        date: dateValue,
+        expense: element['expense'],
       ));
     });
     setState(() {
@@ -208,7 +209,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
     if (currentMode == HueConstants.expenses) {
       currentColor = Colors.red[900];
       currentIcon = Icons.arrow_downward;
-    } else if (currentMode ==HueConstants.credits) {
+    } else if (currentMode == HueConstants.credits) {
       currentColor = Colors.green[900];
       currentIcon = Icons.arrow_upward_rounded;
     } else {
@@ -238,8 +239,11 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
         });
         _refreshChartData();
       },
-      items: <String>[HueConstants.allTransactions, HueConstants.expenses, HueConstants.credits]
-          .map<DropdownMenuItem<String>>((String value) {
+      items: <String>[
+        HueConstants.allTransactions,
+        HueConstants.expenses,
+        HueConstants.credits
+      ].map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(
@@ -253,9 +257,8 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
   Widget getTotalTxText() {
     double value;
     String label;
-    bool negative = false;
 
-    if (currentMode ==HueConstants.credits) {
+    if (currentMode == HueConstants.credits) {
       value = totalReceived;
       label = 'Total:';
     } else if (currentMode == HueConstants.expenses) {
@@ -277,12 +280,16 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
             ),
           ),
         ),
-        SizedBox(width: 5,),
+        SizedBox(
+          width: 5,
+        ),
         FittedBox(
           child: Text(
-            value.toString(),
+            HueConstants.currency.format(value),
             style: TextStyle(
-              color: value.isNegative ? Colors.red : Theme.of(context).primaryColor,
+              color: value.isNegative
+                  ? Colors.red
+                  : Theme.of(context).primaryColor,
               fontSize: 14,
             ),
           ),
@@ -295,7 +302,7 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
     double value;
     String label = 'This Week:';
 
-    if (currentMode ==HueConstants.credits) {
+    if (currentMode == HueConstants.credits) {
       value = weeklyReceived;
     } else if (currentMode == HueConstants.expenses) {
       value = weeklyExpense;
@@ -314,12 +321,16 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
             ),
           ),
         ),
-        SizedBox(width: 5,),
+        SizedBox(
+          width: 5,
+        ),
         FittedBox(
           child: Text(
-            value.toString(),
+            HueConstants.currency.format(value),
             style: TextStyle(
-              color: value.isNegative ? Colors.red : Theme.of(context).primaryColor,
+              color: value.isNegative
+                  ? Colors.red
+                  : Theme.of(context).primaryColor,
               fontSize: 14,
             ),
           ),
@@ -370,7 +381,8 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(top: 5, left: 10, bottom: 0, right: 10),
+                padding:
+                    EdgeInsets.only(top: 5, left: 10, bottom: 0, right: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -392,10 +404,15 @@ class _HueXpenseRouteState extends State<HueXpenseRoute>
                         SizedBox(
                           width: 10,
                         ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        getTotalTxText(),
                         getWeeklyTotal(),
                       ],
                     ),
-                    getTotalTxText(),
                   ],
                 ),
                 width: double.infinity,

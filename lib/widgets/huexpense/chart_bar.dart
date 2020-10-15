@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hueganizer/constants/constants.dart';
 
 class ChartBar extends StatelessWidget {
   final String label;
@@ -20,7 +21,7 @@ class ChartBar extends StatelessWidget {
             height: constraints.maxHeight * 0.15,
             child: FittedBox(
               child: Text(
-                '₹${spendingAmount.toStringAsFixed(0)}',
+                '₹${HueConstants.currency.format(spendingAmount)}',
                   style: TextStyle(
                     color: allTrans && spendingAmount != 0.0 ? barColor : Colors.black,
                   ),

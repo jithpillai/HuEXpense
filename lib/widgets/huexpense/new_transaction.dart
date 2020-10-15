@@ -6,8 +6,9 @@ import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
   final Function onAddPressed;
+  final DateTime selectedDate;
 
-  NewTransaction(this.onAddPressed);
+  NewTransaction(this.onAddPressed, this.selectedDate);
 
   @override
   _NewTransactionState createState() => _NewTransactionState();
@@ -18,7 +19,7 @@ class _NewTransactionState extends State<NewTransaction> {
 
   final _amountController = TextEditingController();
 
-  DateTime pickedDate = DateTime.now();
+  DateTime pickedDate;
 
   String expense = 'true';
 
@@ -51,6 +52,13 @@ class _NewTransactionState extends State<NewTransaction> {
         pickedDate = value;
       });
     });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    pickedDate = widget.selectedDate;
   }
 
   @override

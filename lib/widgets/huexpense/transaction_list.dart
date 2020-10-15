@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hueganizer/constants/constants.dart';
 import '../../models/transaction.dart';
 import 'package:intl/intl.dart';
 
@@ -17,11 +18,14 @@ class TransactionList extends StatelessWidget {
       child: _allTransactions.isEmpty
           ? Column(
               children: [
-                Text(
-                  'No Transaction added yet!',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: Text(
+                    'No Transaction added yet!',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -53,7 +57,7 @@ class TransactionList extends StatelessWidget {
                         padding: EdgeInsets.all(6),
                         child: FittedBox(
                           child: Text(
-                            '₹${_allTransactions[index].amount.toStringAsFixed(0)}',
+                            '₹${HueConstants.currency.format(_allTransactions[index].amount)}',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
