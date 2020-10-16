@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class NoteForm extends StatefulWidget {
   final Function onSavePressed;
@@ -24,6 +25,12 @@ class _NoteFormState extends State<NoteForm> {
     }
     widget.onSavePressed(title, content,);
     Navigator.of(context).pop();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.text = 'Notes - ${DateFormat.yMMMMd().format(DateTime.now())}';
   }
 
   @override
@@ -52,6 +59,7 @@ class _NoteFormState extends State<NoteForm> {
               ),
               TextField(
                 controller: _contentController,
+                autofocus: true,
                 decoration: InputDecoration(
                   labelText: 'Enter your notes here',
                 ),

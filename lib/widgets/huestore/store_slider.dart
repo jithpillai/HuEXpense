@@ -26,10 +26,16 @@ class _StoreSliderState extends State<StoreSlider> {
     Colors.green,
     Colors.blueGrey,
   ];
+  List <Color> builtColors = [];
   List<String> _nonDeletables = ['firstStore', 'secondStore', 'thirdStore'];
-  Color getRandomColor() {
+  Color getRandomColor(index) {
+    int newColor = Random().nextInt(availableColors.length);
     //return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
-    return availableColors[Random().nextInt(availableColors.length)];
+    if (builtColors.length >= index + 1) {
+      return builtColors[index];
+    }
+    builtColors.add(availableColors[newColor]);
+    return availableColors[newColor];
   }
 
   @override
@@ -42,7 +48,7 @@ class _StoreSliderState extends State<StoreSlider> {
               scrollDirection: Axis.horizontal,
               itemCount: allStores.length,
               itemBuilder: (ctx, index) {
-                var color = getRandomColor();
+                var color = getRandomColor(index);
                 var item = allStores[index];
                 return GestureDetector(
                   onTap: () {

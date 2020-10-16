@@ -64,6 +64,7 @@ class _AddStoreFormState extends State<AddStoreForm> {
                 controller: widget._nameController,
                 maxLength: widget.minimizeLength ? 14 : 30,
                 maxLengthEnforced: true,
+                autofocus: true,
                 decoration: InputDecoration(
                   labelText: 'Name',
                 ),

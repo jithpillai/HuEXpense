@@ -83,6 +83,9 @@ class _ViewHueListState extends State<ViewHueList> {
     setState(() {
       _allListItems.addAll(allItems);
     });
+    if (allItems.length == 0) {
+      _startAddForm(myCtx);
+    }
   }
 
   void _onSubmitListSave(context) {

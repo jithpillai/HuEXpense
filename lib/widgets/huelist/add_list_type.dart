@@ -48,6 +48,7 @@ class _AddListTypeState extends State<AddListType> {
                 decoration: InputDecoration(
                   labelText: 'Name',
                 ),
+                autofocus: true,
               ),
               TextField(
                 controller: _descController,

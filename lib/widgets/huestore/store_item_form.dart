@@ -21,7 +21,8 @@ class _StoreItemFormState extends State<StoreItemForm> {
   final _countController = TextEditingController();
   String addedToList = 'false';
   BuildContext myCtx;
-
+  bool isAdd = false;
+  bool isEdit = false;
   void _removeFromShoppingList(StoreItem item) async {
     String itemname = item.name;
     int i = await Database_Helper.instance.deleteHueStoreListItems(item);
@@ -69,6 +70,9 @@ class _StoreItemFormState extends State<StoreItemForm> {
       _nameController.text = widget.updatedStoreItem.name;
       _countController.text = widget.updatedStoreItem.count.toString();
       addedToList = widget.updatedStoreItem.addedToList;
+      isEdit = true;
+    } else {
+      isAdd = true;
     }
   }
 
@@ -90,6 +94,7 @@ class _StoreItemFormState extends State<StoreItemForm> {
             children: <Widget>[
               TextField(
                 controller: _nameController,
+                autofocus: isAdd,
                 maxLength: widget.minimizeLength ? 14 : 30,
                 maxLengthEnforced: true,
                 decoration: InputDecoration(
@@ -101,6 +106,7 @@ class _StoreItemFormState extends State<StoreItemForm> {
                 decoration: InputDecoration(
                   labelText: 'Quantity',
                 ),
+                autofocus: isEdit,
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly

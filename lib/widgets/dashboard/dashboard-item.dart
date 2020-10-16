@@ -21,7 +21,7 @@ class DashboardItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        return Navigator.pushReplacementNamed(
+        return Navigator.pushNamed(
                   context, routes);
       },
       child: Container(

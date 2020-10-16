@@ -6,6 +6,8 @@ class ViewNotes extends StatelessWidget {
   final String title;
   final String content;
   final Function onSavePressed;
+  bool pageDirty = false;
+  BuildContext myCtx;
 
   final _titleController = TextEditingController();
 
@@ -29,11 +31,39 @@ class ViewNotes extends StatelessWidget {
       newtitle,
       newcontent,
     );
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(true);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Future<bool> _onWillPop() async {
+    if (!pageDirty) {
+      return true;
+    }
+
+    return (await showDialog(
+          context: myCtx,
+          builder: (ctx) => new AlertDialog(
+            title: new Text('Confirmation'),
+            content: new Text('Do you want to save the changes?'),
+            actions: <Widget>[
+              new FlatButton(
+                onPressed: () =>
+                    Navigator.of(ctx).pop(true), //false will stop the pop
+                child: new Text('No'),
+              ),
+              new FlatButton(
+                onPressed: () {
+                  _submitNote(ctx);
+                },
+                child: new Text('Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
+  Scaffold _getMainContainer(context) {
+    myCtx = context;
     return new Scaffold(
       appBar: new AppBar(
         title: new TextField(
@@ -46,23 +76,32 @@ class ViewNotes extends StatelessWidget {
           ),
         ),
         actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.share),
-          color: Colors.white,
-          onPressed: () {
-            String newtitle = _titleController.text;
-            String newcontent = _contentController.text;
-            String shareContent = '*'+newtitle+'* \n'; //* added for Whatsapp bold text
+          IconButton(
+            icon: Icon(Icons.share),
+            color: Colors.white,
+            onPressed: () {
+              String newtitle = _titleController.text;
+              String newcontent = _contentController.text;
+              String shareContent =
+                  '*' + newtitle + '* \n'; //* added for Whatsapp bold text
 
-            shareContent += newcontent; 
-            final RenderBox box = context.findRenderObject();
-            Share.share(
-              shareContent,
-              subject:  'Notes: '+newcontent,
-              sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
-            );
-          },
-        ),],
+              shareContent += newcontent;
+              final RenderBox box = context.findRenderObject();
+              Share.share(
+                shareContent,
+                subject: 'Notes: ' + newcontent,
+                sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.save),
+            color: Colors.white,
+            onPressed: () {
+              _submitNote(context);
+            },
+          ),
+        ],
       ),
       body: new Container(
         width: double.infinity,
@@ -76,8 +115,12 @@ class ViewNotes extends StatelessWidget {
                 labelText: 'Your notes here',
               ),
               maxLines: null,
+              autofocus: true,
               keyboardType: TextInputType.multiline,
               onSubmitted: (_) => {},
+              onChanged: (value) {
+                pageDirty = true;
+              },
             ),
           ],
         ),
@@ -109,6 +152,15 @@ class ViewNotes extends StatelessWidget {
           _submitNote(context);
         },
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return WillPopScope(
+      child: _getMainContainer(context),
+      onWillPop: _onWillPop,
     );
   }
 }
