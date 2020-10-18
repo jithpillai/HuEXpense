@@ -17,6 +17,8 @@ class DashboardItem extends StatelessWidget {
     this.icon,
   });
 
+  IconData tempIcon = Icons.mic;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

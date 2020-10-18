@@ -7,6 +7,7 @@ import 'package:hueganizer/widgets/huelist/huelist_route.dart';
 import 'package:hueganizer/widgets/huenotes/huenotes_route.dart';
 import 'package:hueganizer/widgets/huestore/huestore_route.dart';
 import 'package:hueganizer/widgets/huexpense/huexpense_route.dart';
+import 'package:hueganizer/widgets/voice_detect/voice_read_route.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations(
@@ -76,6 +77,7 @@ class AfterSplash extends StatelessWidget {
         HueConstants.hueNotes: (context) => HueNotesRoute(),
         HueConstants.hueList: (context) => HueListRoute(),
         HueConstants.hueStore: (context) => HueStoreRoute(),
+        HueConstants.hueVoiceRead: (context) => VoiceReadRoute(),
       },
     );
   }

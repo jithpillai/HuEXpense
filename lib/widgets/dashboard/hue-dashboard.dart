@@ -4,8 +4,16 @@ import 'package:hueganizer/models/dash_item.dart';
 import 'package:hueganizer/widgets/app_drawer.dart';
 import 'package:hueganizer/widgets/dashboard/dashboard-item.dart';
 
-class HueDashboard extends StatelessWidget {
+class HueDashboard extends StatefulWidget {
   static const String routeName = '/dashboard';
+
+  @override
+  _HueDashboardState createState() => _HueDashboardState();
+}
+
+class _HueDashboardState extends State<HueDashboard> {
+  final GlobalKey<ScaffoldState> _dashBoardKey = new GlobalKey<ScaffoldState>();
+
   List<DashItem> dashItems = [
     DashItem(
       id: 'hue-store',
@@ -40,6 +48,7 @@ class HueDashboard extends StatelessWidget {
         icon: Icons.account_balance_wallet,
       ),
   ];
+
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
@@ -48,6 +57,7 @@ class HueDashboard extends StatelessWidget {
     
     return new Scaffold(
       appBar: appBar,
+      key: _dashBoardKey,
       drawer: AppDrawer(),
       body: Container(
         padding: EdgeInsets.all(20),
@@ -70,6 +80,15 @@ class HueDashboard extends StatelessWidget {
             mainAxisSpacing: 20,
           ),
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
+        child: Icon(Icons.mic),
+        onPressed: () {
+          return Navigator.pushNamed(
+                  context, HueConstants.hueVoiceRead);
+        },
       ),
     );
   }

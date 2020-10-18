@@ -30,7 +30,7 @@ class _NoteFormState extends State<NoteForm> {
   @override
   void initState() {
     super.initState();
-    _titleController.text = 'Notes - ${DateFormat.yMMMMd().format(DateTime.now())}';
+    _titleController.text = 'Notes - ${DateFormat.yMMMd().format(DateTime.now())}';
   }
 
   @override
